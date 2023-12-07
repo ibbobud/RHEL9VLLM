@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  vllm-api:
+    build: .
+    user: "vllm"
+    command: >
+      python -m vllm.entrypoints."${API_SERVER}".api_server
+      --model "${MODEL}"
+      --dtype "${DTYPE}"
+      --max-model-len "${MAX_MODEL_LEN}"
+      --quantization "${QUANTIZATION}"
+    ports:
+      - "8000:8000"
+    ipc: "host"
+    restart: unless-stopped
+    #volumes:
+    #  - "~/.cache/huggingface:/home/vllm/.cache/huggingface/"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              #device_ids: [ '0' ]
+              capabilities: [ gpu ]
+    #ulimits:
+    #  memlock: -1
+    #  stack: 67108864
+    labels:
+      com.example.description: "RHEL 9 Base with VLLM application using OpenAI API"
+      com.example.maintainer: "Adam Fugate"
+      com.example.contact: "ibbobud@gmail.com"
+    #healthcheck:
+      #test: ["CMD", "curl", "-f", "http://localhost:8000/v1"]
+      #interval: 30s
+      #timeout: 10s
+      #retries: 3
+      #start_period: 30s
+
+       #     --quantization "${QUANTIZATION}"
